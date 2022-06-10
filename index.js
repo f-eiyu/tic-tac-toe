@@ -11,6 +11,8 @@ const TILE_O = 2;
 const TILE_BG_COLOR_DEFAULT = "#CCC";
 const TILE_BG_COLOR_HOVERED = "#AAA";
 const TILE_BG_COLOR_PLAYED = "#FFF";
+const TEXT_HOVER_COLOR = "#888";
+const TEXT_PLAYED_COLOR = "#000";
 
 // global variables
 let turnCount = 0;
@@ -25,7 +27,7 @@ const gameBoardArray = []; // 2D array that stores each tile object
 // returns the DOM for the tile at the specified position
 // ex. retrieveTile(1, 3) -> returns the top right tile
 const retrieveTile = (rowNum, colNum) => {
-    return gameBoardArray[rowNum, colNum];
+    return gameBoardArray[rowNum - 1][colNum - 1];
 }
 
 // returns whether the current move should be X or O, in the form of the TILE_ constant
@@ -44,7 +46,7 @@ const hoverTile = (event) => { // placeholder for now
     if (!gameIsLive || thisTile.content) { return; }
 
     thisTile.style.backgroundColor = TILE_BG_COLOR_HOVERED;
-    thisTile.style.color = "#666";
+    thisTile.style.color = TEXT_HOVER_COLOR;
     thisTile.innerText = (thisMove() === TILE_X ? "X" : "O");
 }
 
@@ -75,7 +77,7 @@ const clickTile = (event) => {
 
     // update the tile graphically
     thisTile.style.backgroundColor = TILE_BG_COLOR_PLAYED;
-    thisTile.style.color = "#000";
+    thisTile.style.color = TEXT_PLAYED_COLOR;
     thisTile.innerText = `${thisMove() === TILE_X ? "X" : "O"}`;
 
     turnCount++;
