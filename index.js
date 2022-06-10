@@ -27,18 +27,18 @@ const gameBoardArray = []; // 2D array that stores each tile object
 // ========== UTILITY FUNCTIONS ==========
 
 // returns the DOM for the tile at the specified position
-// ex. retrieveTile(1, 3) -> returns the top right tile
-const retrieveTile = (rowNum, colNum) => {
+// ex. _retrieveTile(1, 3) -> returns the top right tile
+const _retrieveTile = (rowNum, colNum) => {
     return gameBoardArray[rowNum - 1][colNum - 1];
 }
 
 // returns whether the current move should be X or O, in the form of the TILE_ constant
-const thisMove = () => {
+const _thisMove = () => {
     return (turnCount % 2 === 0 ? TILE_X : TILE_O);
 }
 
 // transposes a square two-dimensional array
-const transposeArray = (toTranspose) => {
+const _transposeArray = (toTranspose) => {
     const transposed = [];
 
     for (let col = 0; col < toTranspose.length; col++) {
@@ -54,7 +54,7 @@ const transposeArray = (toTranspose) => {
 
 // returns true if the specified property of every element in toCheck is the
 // same, and false if otherwise
-const isArrayAllEqual = (toCheck, property) => {
+const _isArrayAllEqual = (toCheck, property) => {
     // due to the transitive property, it's sufficient to compare each
     // element to the first element
     return toCheck.every( function(thisElement) {
@@ -74,7 +74,7 @@ const hoverTile = (event) => { // placeholder for now
 
     thisTile.style.backgroundColor = TILE_BG_COLOR_HOVERED;
     thisTile.style.color = TEXT_HOVER_COLOR;
-    thisTile.innerText = (thisMove() === TILE_X ? "X" : "O");
+    thisTile.innerText = (_thisMove() === TILE_X ? "X" : "O");
 }
 
 // ... and change it back when not hovered
@@ -96,14 +96,14 @@ const checkVictory = () => {
 
     // check every row
     for (row of gameBoardArray) {
-        if (isArrayAllEqual(row, "content")) { return true; }
+        if (_isArrayAllEqual(row, "content")) { return true; }
     }
 
     // transpose array for easier column access
-    const gameBoardArrayTranspose = transposeArray(gameBoardArray);
+    const gameBoardArrayTranspose = _transposeArray(gameBoardArray);
     // check every column (ie. every row in the transposed array)
     for (row of gameBoardArrayTranspose) {
-        if (isArrayAllEqual(row, "content")) { return true; }
+        if (_isArrayAllEqual(row, "content")) { return true; }
     }
 
     // check descending diagonal
@@ -111,7 +111,7 @@ const checkVictory = () => {
     for (let rowCol = 0; rowCol < gameBoardArray.length; rowCol++) {
         diagDown.push(gameBoardArray[rowCol][rowCol]);
     }
-    if (isArrayAllEqual(diagDown, "content")) { return true; }
+    if (_isArrayAllEqual(diagDown, "content")) { return true; }
 
     // check ascending diagonal
     const diagUp = [];
@@ -119,7 +119,7 @@ const checkVictory = () => {
         let col = gameBoardArray[row].length - row - 1;
         diagUp.push(gameBoardArray[row][col]);
     }
-    if (isArrayAllEqual(diagUp, "content")) { return true; }
+    if (_isArrayAllEqual(diagUp, "content")) { return true; }
 }
 
 // ends the game and displays a victory message
@@ -142,12 +142,12 @@ const clickTile = (event) => {
     if (thisTile.content) { return; } // don't do anything if the tile is already played
 
     // remember the move
-    thisTile.content = thisMove();
+    thisTile.content = _thisMove();
 
     // update the tile graphically
     thisTile.style.backgroundColor = TILE_BG_COLOR_PLAYED;
     thisTile.style.color = TEXT_PLAYED_COLOR;
-    thisTile.innerText = `${thisMove() === TILE_X ? "X" : "O"}`;
+    thisTile.innerText = `${_thisMove() === TILE_X ? "X" : "O"}`;
 
     turnCount++;
 }
