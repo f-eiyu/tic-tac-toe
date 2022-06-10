@@ -56,9 +56,14 @@ const clickTile = (event) => {
     checkVictory();
 }
 
-// 
+// start a fresh, brand new game of tic tac toe
 const initializeGameBoard = () => {
     const gameBoardContainer = document.querySelector("#game-board");
+
+    // empty gameBoardContainer to purge a potential previous game
+    while (gameBoardContainer.firstChild) {
+        gameBoardContainer.removeChild(gameBoardContainer.firstChild);
+    }
 
     // generate nine game tiles
     for (let row = 1; row <= 3; row++) { // three rows
