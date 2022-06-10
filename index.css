@@ -12,7 +12,3 @@ body {
     grid-template: repeat(3, 1fr) / repeat(3, 1fr);
     grid-gap: 1%;
 }
-
-.game-tile {
-    background-color: #ccc;
-}
