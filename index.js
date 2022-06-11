@@ -24,12 +24,53 @@ const gameBoardArray = []; // 2D array that stores each tile object
 
 
 
-// ========== UTILITY FUNCTIONS ==========
+// ========== UTILITY/INTERNAL FUNCTIONS ==========
 
 // returns the DOM for the tile at the specified position
 // ex. _retrieveTile(1, 3) -> returns the top right tile
-const _retrieveTile = (rowNum, colNum) => {
+const _getTile = (rowNum, colNum) => {
     return gameBoardArray[rowNum - 1][colNum - 1];
+}
+
+// returns the row of tile objects specified by rowNum
+const _getRow = (rowNum) => {
+    return gameBoardArray[rowNum - 1];
+}
+
+// returns the column of tile objects specified by colNum, as a horizontal (1D) array
+const _getCol = (colNum) => {
+    const thisCol = [];
+
+    for (row of gameBoardArray) {
+        thisCol.push(row[colNum - 1]);
+    }
+
+    return thisCol;
+}
+
+// returns the diagonal of tile objects going downwards from the top left,
+// as a horizontal (1D) array
+const _getDiagDown = () => {
+    const thisDiag = [];
+
+    for (let rowCol = 0; rowCol < gameBoardArray.length; rowCol++) {
+        thisDiag.push(gameBoardArray[rowCol][rowCol]);
+    }
+
+    return thisDiag;
+}
+
+// returns the diagonal of tile objects going upwards from the bottom left,
+// as a horizontal (1D) array
+const _getDiagUp = () => {
+    const thisDiag = [];
+
+    for (let row = 0; row < gameBoardArray.length; row++) {
+        const col = gameBoardArray[row].length - row - 1;
+        thisDiag.push(gameBoardArray[row][col]);
+    }
+
+    return thisDiag;
 }
 
 // returns whether the current move should be X or O, in the form of the TILE_ constant
@@ -77,7 +118,7 @@ const hoverTile = (event) => { // placeholder for now
     thisTile.innerText = (_thisMove() === TILE_X ? "X" : "O");
 }
 
-// ... and change it back when not hovered
+// ... and change back when not hovered
 const unhoverTile = (event) => {
     const thisTile = event.target;
 
@@ -88,11 +129,10 @@ const unhoverTile = (event) => {
 }
 
 // check victory conditions and potentially end game
+// naive approach: hard-code and check every potentially winning pattern
 const checkVictory = () => {
     // impossible to win before turn 5 no matter how well/badly someone plays
-    if (turnCount < 5) { return; }
-
-    // naive approach: hard-code and check every potentially winning pattern
+    if (turnCount < 5) { return false; }
 
     // check every row
     for (row of gameBoardArray) {
@@ -120,6 +160,40 @@ const checkVictory = () => {
         diagUp.push(gameBoardArray[row][col]);
     }
     if (_isArrayAllEqual(diagUp, "content")) { return true; }
+
+    // if we've made it here, all of our victory checks have failed
+    return false;
+}
+
+// alternate, more efficient method to check victory: check only the row, column, and
+// maybe diagonal associated with the last move made.
+const checkVictoryAlt = (event) => {
+    // it's impossible to win before turn 5
+    if (turnCount < 5) { return; }
+
+    thisTile = event.target;
+
+    console.log("thisTile", thisTile.row, thisTile.col, ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
+    && (thisTile.col === 1 || thisTile.col === gameBoardArray.length))); // debug
+    console.log(_getDiagDown());
+    
+    // always check row and column
+    if (_isArrayAllEqual(_getRow(thisTile.row), "content")) { return true; }
+    else if (_isArrayAllEqual(_getCol(thisTile.col), "content")) { return true; }
+
+    // only check diagonal if we have a corner tile. the row and column must both be 
+    // some permutation of 1 and gameBoardArray.length for a corner tile.
+    else if ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
+            && (thisTile.col === 1 || thisTile.col === gameBoardArray.length)) {
+                // check downwards diag for a tile at (1, 1) or at (length, length)
+                if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) { return true; }
+
+                // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
+                else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
+    }
+
+    // if we've made it here, all our victory checks have failed
+    return false;
 }
 
 // ends the game and displays a victory message
@@ -173,7 +247,7 @@ const initializeGameBoard = () => {
             thisTile.addEventListener("click", function (e) {
                 if (gameIsLive) {
                     clickTile(e);
-                    if (checkVictory()) { executeVictory(); }
+                    if (checkVictoryAlt(e)) { executeVictory(); }
                     else if (turnCount >= 9) { executeTie(); }
                 }
             });
@@ -182,6 +256,8 @@ const initializeGameBoard = () => {
 
             // initialize each tile's properties
             thisTile.content = TILE_BLANK;
+            thisTile.row = row;
+            thisTile.col = col;
 
             // make the tile pretty
             thisTile.style.backgroundColor = TILE_BG_COLOR_DEFAULT;
@@ -198,12 +274,6 @@ const initializeGameBoard = () => {
     gameIsLive = true;
     console.log("Tile framework loaded!"); // debug
 }
-
-
-
-
-
-
 
 
 
