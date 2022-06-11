@@ -16,9 +16,14 @@ const TEXT_PLAYED_COLOR = "#000";
 const TEXT_VICTORY_COLOR = "green";
 const TEXT_DEFEAT_COLOR = "red";
 
-// global variables
+// global variables and flags
 let turnCount = 0;
 let gameIsLive = false;
+let numberOfGames = 0;
+let playAgainstComputer = false;
+let computerHardMode = false;
+
+let debug = true;
 
 const gameBoardArray = []; // 2D array that stores each tile object
 
@@ -73,24 +78,9 @@ const _getDiagUp = () => {
     return thisDiag;
 }
 
-// returns whether the current move should be X or O, in the form of the TILE_ constant
+// returns whether the current move is X or O, in the form of the TILE_ constant
 const _thisMove = () => {
     return (turnCount % 2 === 0 ? TILE_X : TILE_O);
-}
-
-// transposes a square two-dimensional array
-const _transposeArray = (toTranspose) => {
-    const transposed = [];
-
-    for (let col = 0; col < toTranspose.length; col++) {
-        const thisColumn = [];
-        for (let row = 0; row < toTranspose[col].length; row++) {
-            thisColumn.push(toTranspose[row][col]);
-        }
-        transposed.push(thisColumn);
-    }
-
-    return transposed;
 }
 
 // returns true if the specified property of every element in toCheck is the
@@ -128,92 +118,12 @@ const unhoverTile = (event) => {
     thisTile.innerText = "";
 }
 
-// check victory conditions and potentially end game
-// naive approach: hard-code and check every potentially winning pattern
-const checkVictory = () => {
-    // impossible to win before turn 5 no matter how well/badly someone plays
-    if (turnCount < 5) { return false; }
-
-    // check every row
-    for (row of gameBoardArray) {
-        if (_isArrayAllEqual(row, "content")) { return true; }
-    }
-
-    // transpose array for easier column access
-    const gameBoardArrayTranspose = _transposeArray(gameBoardArray);
-    // check every column (ie. every row in the transposed array)
-    for (row of gameBoardArrayTranspose) {
-        if (_isArrayAllEqual(row, "content")) { return true; }
-    }
-
-    // check descending diagonal
-    const diagDown = [];
-    for (let rowCol = 0; rowCol < gameBoardArray.length; rowCol++) {
-        diagDown.push(gameBoardArray[rowCol][rowCol]);
-    }
-    if (_isArrayAllEqual(diagDown, "content")) { return true; }
-
-    // check ascending diagonal
-    const diagUp = [];
-    for (let row = 0; row < gameBoardArray.length; row++) {
-        let col = gameBoardArray[row].length - row - 1;
-        diagUp.push(gameBoardArray[row][col]);
-    }
-    if (_isArrayAllEqual(diagUp, "content")) { return true; }
-
-    // if we've made it here, all of our victory checks have failed
-    return false;
-}
-
-// alternate, more efficient method to check victory: check only the row, column, and
-// maybe diagonal associated with the last move made.
-const checkVictoryAlt = (event) => {
-    // it's impossible to win before turn 5
-    if (turnCount < 5) { return; }
-
-    thisTile = event.target;
-
-    console.log("thisTile", thisTile.row, thisTile.col, ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
-    && (thisTile.col === 1 || thisTile.col === gameBoardArray.length))); // debug
-    console.log(_getDiagDown());
-    
-    // always check row and column
-    if (_isArrayAllEqual(_getRow(thisTile.row), "content")) { return true; }
-    else if (_isArrayAllEqual(_getCol(thisTile.col), "content")) { return true; }
-
-    // only check diagonal if we have a corner tile. the row and column must both be 
-    // some permutation of 1 and gameBoardArray.length for a corner tile.
-    else if ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
-            && (thisTile.col === 1 || thisTile.col === gameBoardArray.length)) {
-                // check downwards diag for a tile at (1, 1) or at (length, length)
-                if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) { return true; }
-
-                // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
-                else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
-    }
-
-    // if we've made it here, all our victory checks have failed
-    return false;
-}
-
-// ends the game and displays a victory message
-const executeVictory = (winner) => { // still mostly placeholders
-    console.log("victory");
-    gameIsLive = false;
-}
-
-// ends the game and displays a tie message
-const executeTie = () => { // still mostly placeholders
-    console.log("tie game");
-    gameIsLive = false;
-}
-
 // play a tile when it's clicked
 const clickTile = (event) => {
-    if (!gameIsLive) { return; }
-
     const thisTile = event.target;
-    if (thisTile.content) { return; } // don't do anything if the tile is already played
+    if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
+
+    if (!gameIsLive || thisTile.content) { return; }
 
     // remember the move
     thisTile.content = _thisMove();
@@ -226,40 +136,84 @@ const clickTile = (event) => {
     turnCount++;
 }
 
+// let the computer play a tile!
+const computerTurn = () => { // placeholder
+    return;
+}
+
+// check for victory: search only the row, column, and maybe diagonal associated
+// with the last move that was made.
+const checkVictory = (event) => {
+    // it's impossible to win before turn 5
+    if (turnCount < 5) { return; }
+
+    thisTile = event.target;
+    
+    // always check row and column
+    if (debug) { console.log("Checking row and column"); }
+    if (_isArrayAllEqual(_getRow(thisTile.row), "content")) { return true; }
+    else if (_isArrayAllEqual(_getCol(thisTile.col), "content")) { return true; }
+
+    // only check diagonal if we have a corner tile. the row and column must both be 
+    // some permutation of 1 and gameBoardArray.length for a corner tile.
+    else if ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
+            && (thisTile.col === 1 || thisTile.col === gameBoardArray.length)) {
+                if (debug) { console.log("Checking diagonal"); }
+                // check downwards diag for a tile at (1, 1) or at (length, length)
+                if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) { return true; }
+
+                // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
+                else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
+    }
+
+    // if we've made it here, all our victory checks have failed
+    return false;
+}
+
+// end the game and displays a victory message
+const executeVictory = (winner) => { // still mostly placeholders
+    if (debug) { console.log("Victory reached"); }
+    gameIsLive = false;
+}
+
+// end the game and displays a tie message
+const executeTie = () => { // still mostly placeholders
+    if (debug) { console.log("Tie game reached"); }
+    gameIsLive = false;
+}
+
 // start a fresh, brand new game of tic tac toe
 const initializeGameBoard = () => {
     const gameBoardContainer = document.querySelector("#game-board");
 
-    // empty gameBoardContainer and gameBoardArray to purge a potential previous game
+    // purge a potential previous game
     while (gameBoardContainer.firstChild) {
         gameBoardContainer.removeChild(gameBoardContainer.firstChild);
     }
     while (gameBoardArray.length) { gameBoardArray.pop(); }
 
-    // generate nine game tiles
-    for (let row = 1; row <= 3; row++) { // three rows
+    // generate three rows x three columns of game tiles
+    for (let row = 1; row <= 3; row++) {
         const thisRowArray = [];
-        for (let col = 1; col <= 3; col++) { // three columns
+        for (let col = 1; col <= 3; col++) {
             const thisTile = document.createElement("div");
             thisTile.classList.add("game-tile");
 
-            // listen to each tile
             thisTile.addEventListener("click", function (e) {
-                if (gameIsLive) {
-                    clickTile(e);
-                    if (checkVictoryAlt(e)) { executeVictory(); }
-                    else if (turnCount >= 9) { executeTie(); }
-                }
+                if (!gameIsLive) { return; }
+                
+                clickTile(e);
+                if (checkVictory(e)) { executeVictory(); }
+                else if (turnCount >= 9) { executeTie(); }
+                else if (playAgainstComputer) { computerTurn(); }
             });
             thisTile.addEventListener("mouseover", hoverTile);
             thisTile.addEventListener("mouseout", unhoverTile);
 
-            // initialize each tile's properties
             thisTile.content = TILE_BLANK;
             thisTile.row = row;
             thisTile.col = col;
 
-            // make the tile pretty
             thisTile.style.backgroundColor = TILE_BG_COLOR_DEFAULT;
 
             // add the tile to the grid and keep track of it internally
@@ -272,10 +226,10 @@ const initializeGameBoard = () => {
     }
 
     gameIsLive = true;
-    console.log("Tile framework loaded!"); // debug
+    if (debug) { console.log("Tile framework loaded!"); }
 }
 
 
 
-// debug
+
 initializeGameBoard();
