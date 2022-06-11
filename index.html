@@ -10,8 +10,25 @@
     </head>
     <body>
         <h1>Tic Tac Toe!</h1>
-        <div id="game-board"></div>
-        
+        <div id="game-container">
+            <div id="game-board"></div>
+            <div id="infobox">
+                <p class="infobox-entry">The next tile will be <span id="next-tile">X</span>.</p>
+                <p class="infobox-entry">The current turn is <span id="current-turn">0</span>.</p>
+                <p class="infobox-entry">You have played <span id="game-count">0 games</span>.</p>
+                <p class="infobox-entry"></p>
+
+                <div id="reset">
+                    <button>Reset</button> and play against:
+                    <select id="opponent">
+                        <option value="person">another person</option>
+                        <option value="easyAI">easy computer</option>
+                        <option value="hardAI">hard computer</option>
+                    </select> 
+                </div>
+            </div>
+            
+        </div>
         <script src="index.js" async defer></script>
     </body>
 </html>

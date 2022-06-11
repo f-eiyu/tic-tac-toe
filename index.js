@@ -93,7 +93,7 @@ const _isArrayAllEqual = (toCheck, property) => {
 /// ========== GAMEPLAY/UI FUNCTIONS ==========
 
 // change tile aesthetics when hovered...
-const hoverTile = (event) => { // placeholder for now
+const hoverTile = (event) => {
     const thisTile = event.target;
 
     if (!gameIsLive || thisTile.content) { return; }

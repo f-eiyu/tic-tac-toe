@@ -5,14 +5,52 @@ body {
     font-family: sans-serif;
 }
 
-#game-board {
+h1 {
+    font-size: 50pt;
+    margin-bottom: -40px;
+}
+
+#game-container {
     display: grid;
+    grid-template: 1fr / 1fr 1fr 1fr;
+
+    max-width: 1200px;
+    margin: auto;
+    user-select: none;
+}
+
+#game-board {
+    display: inline-grid;
     height: 450px;
     width: 450px;
     margin: 100px auto;
+    grid-column-start: 2;
 
     grid-template: repeat(3, 1fr) / repeat(3, 1fr);
     grid-gap: 1%;
+
+    order: 1;
+}
+
+#infobox {
+    display: inline-flex;
+    text-align: left;
+    height: 180px;
+    width: 330px;
+    margin: auto;
+    border: solid white 1px;
+
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    margin-left: 30px;
+    padding-left: 20px;
+
+    order: 2;
+}
+
+.infobox-entry {
+    margin: 0;
 }
 
 .game-tile {
