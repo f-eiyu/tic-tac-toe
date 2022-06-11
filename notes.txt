@@ -1,6 +1,6 @@
 remaining to dos, roughly in order (R = required, O = optional, D = done):
 
-    - [O] refactor all of the aesthetic consts out of .js and into .css classes
+    - [D] refactor all of the aesthetic consts out of .js and into .css classes
 
     - [R] add a functional reset button
     - [R] keep track of the game stats on the front end (ex. turn count)

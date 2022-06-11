@@ -7,15 +7,6 @@ const TILE_BLANK = 0; // falsey, to make conditionals easier later on
 const TILE_X = 1; // X and Y both truthy
 const TILE_O = 2;
 
-// aesthetic constants
-const TILE_BG_COLOR_DEFAULT = "#CCC";
-const TILE_BG_COLOR_HOVERED = "#AAA";
-const TILE_BG_COLOR_PLAYED = "#FFF";
-const TEXT_HOVER_COLOR = "#888";
-const TEXT_PLAYED_COLOR = "#000";
-const TEXT_VICTORY_COLOR = "green";
-const TEXT_DEFEAT_COLOR = "red";
-
 // global variables and flags
 let turnCount = 0;
 let gameIsLive = false;
@@ -25,6 +16,7 @@ let computerHardMode = false;
 const BOARD_SIZE = 3;
 
 let debug = true;
+let aiDebug = true;
 
 const gameBoardArray = []; // 2D array that stores each tile object
 
@@ -98,8 +90,7 @@ const hoverTile = (event) => {
 
     if (!gameIsLive || thisTile.content) { return; }
 
-    thisTile.style.backgroundColor = TILE_BG_COLOR_HOVERED;
-    thisTile.style.color = TEXT_HOVER_COLOR;
+    thisTile.classList.add("hovered");
     thisTile.innerText = (_thisMove() === TILE_X ? "X" : "O");
 }
 
@@ -109,7 +100,7 @@ const unhoverTile = (event) => {
 
     if (!gameIsLive || thisTile.content) { return; }
 
-    thisTile.style.backgroundColor = TILE_BG_COLOR_DEFAULT;
+    thisTile.classList.remove("hovered");
     thisTile.innerText = "";
 }
 
@@ -121,8 +112,7 @@ const clickTile = (event) => {
     thisTile.content = _thisMove();
 
     // update the tile graphically
-    thisTile.style.backgroundColor = TILE_BG_COLOR_PLAYED;
-    thisTile.style.color = TEXT_PLAYED_COLOR;
+    thisTile.classList.add("played");
     thisTile.innerText = `${_thisMove() === TILE_X ? "X" : "O"}`;
 
     turnCount++;
@@ -217,8 +207,6 @@ const initializeGameBoard = () => {
             thisTile.content = TILE_BLANK;
             thisTile.row = row;
             thisTile.col = col;
-
-            thisTile.style.backgroundColor = TILE_BG_COLOR_DEFAULT;
 
             // add the tile to the grid and keep track of it internally
             gameBoardContainer.appendChild(thisTile);
