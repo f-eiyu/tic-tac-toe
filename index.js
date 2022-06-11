@@ -121,11 +121,8 @@ const unhoverTile = (event) => {
 // play a tile when it's clicked
 const clickTile = (event) => {
     const thisTile = event.target;
-    if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
 
-    if (!gameIsLive || thisTile.content) { return; }
-
-    // remember the move
+    // mark the move in the tile
     thisTile.content = _thisMove();
 
     // update the tile graphically
@@ -200,7 +197,12 @@ const initializeGameBoard = () => {
             thisTile.classList.add("game-tile");
 
             thisTile.addEventListener("click", function (e) {
-                if (!gameIsLive) { return; }
+                if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
+                
+                if (!gameIsLive) { return; } // stop if the game isn't live
+                if (e.target.content) { return; } // stop if the tile is already occupied
+
+                if (debug) { console.log("Click successfully registered."); }
                 
                 clickTile(e);
                 if (checkVictory(e)) { executeVictory(); }
