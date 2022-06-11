@@ -1,0 +1,106 @@
+remaining to dos, roughly in order (R = required, O = optional, D = done):
+
+    - [O] refactor all of the aesthetic consts out of .js and into .css classes
+
+    - [R] add a functional reset button
+    - [R] keep track of the game stats on the front end (ex. turn count)
+    - [R] actually declare the winner instead of just halting the game
+
+    - [O] make the front end look not horrendous
+
+    - [O] significantly refactor code to allow more cleanly for minimax AI
+        - the main task is to make checkVictory() and its associated requirements
+             more modular -- taking an event object as its input currently works 
+             quite well, but will not work well for any sort of recursive AI
+
+
+----------
+
+
+explaining the minimax algorithm to myself
+
+    - "for each possible action of the player, we check all possible actions of the other players and determine the worst possible combination of actions—the one that gives player i the smallest value. Then, we determine which action player i can take in order to make sure that this smallest value is the highest possible." -- wikipedia
+
+    - we are the MAXIMIZER player -- we are trying to MAXIMIZE our own score.
+    - our opponent is the MINIMIZER player -- they are trying to MINIMIZE *OUR* score.
+        - we don't really consider the opponent's score in this situation. we are ONLY
+          trying to maximize our own score.
+
+    - when trying to make our decision, we assume the minimizer plays optimally. example:
+
+
+                  0           <- game start
+                /   \
+               3     4        <- maximizer's choice
+              / \   / \
+             4   5 2   9      <- minimizer's choice
+
+
+    - the numbers in this table represent the number of points that *WE* will get on that
+      move. if we pick 4, we get 4 points, and if the minimizer picks 9, WE get 9 points
+      (we don't care about the minimizer's points), so we'll have a total of 13 points
+      at the end of the game.
+    - the maximizer (us) will try to make the point total as big as possible. the minimizer
+      (opponent) will try to make this point total as small as possible.
+
+    - let's say we go for "4" right off the bat, the minimizer will go for the "2" on
+      the level below.
+
+        - there is NO universe in which we ever get the "9", since that level happens on
+          the minimizer's turn and we assume that they play optimally!
+        - SO: if we choose the option that gets us 4 points, the minimizer chooses the
+          option that gets us 2 points => we get 6 points in total.
+
+    - what if we didn't go for "4" right off the bat? this seems like it would not help
+      us achieve our maximizer goals at all -- if our intention is to maximize, why would 
+      we go for the choice that has less value?
+
+        - when we make our choices, we also need to consider what the minimizer will do.
+        - again, we assume the minimizer will play optimally. (this naturally will lead to
+          a sort of "assume the worst" outcome for us. more on this later.)
+        - so, what if we did pick the "3" first?
+        - well, in that case, the minimizer would be forced to choose between "4" and "5",
+          and it will of course choose "4", because it wants to minimize our score.
+
+        - crucially, our total in this case is 7 points -- a BETTER outcome than if we had
+          picked the initially more valuable branch!
+
+    - our best outcome, assuming our opponent plays perfectly, is 7 points.
+    - if our opponent *doesn't* play perfectly for whatever reason, it is possible for us
+      to get more than 7 points, of course.
+    - we do not consider those possibilities -- if we can MAXIMIZE OUR WORST-CASE SCENARIO,
+      we give ourselves the best chance of coming out ahead no matter how good our opponent is.
+
+    - the minimax algorithm (at least for tic-tac-toe, because it's a simple game) will
+      look forwards at the ENTIRE tree of possible moves.
+        - (for more complicated games, we don't get to look at the entire move tree,
+           because that would take eons! a chess AI is much harder to code than a
+           tic-tac-toe AI.)
+    - on each of our hypothetical turns, we try to MAXIMIZE our own board position.
+    - on each of our opponent's hypothetical turns, we put ourselves in their shoes
+      and try to MINIMIZE our own board position instead.
+    - we flip back and forth between our turn and our opponent's turn until we've exhausted
+      all possibilities.
+    - once we've elucidated all the potential options, we choose to follow the branch
+      of the tree that will give us the "best worst-case outcome".
+
+    - for tic-tac-toe, the algorithm will win if it can, but in some interpretation, it's not
+      necessarily trying to win explicitly. we can think about it as trying to dodge a loss until
+      a victory option is clear -- another way to think about "best worst-case outcome".
+
+
+    rough minimax pseudocode. we'll treat a victory as +1 point for the maximizer and a loss as -1
+    point for the maximizer.
+    
+    function minimax(board state) {
+        find all possible moves on the current board
+
+        for (each possible move) {
+            if (win) return 1;
+            else if (loss) return -1;
+            else if (tie) return 0;
+
+            else // the next move doesn't win, lose or tie
+                minimax(next board state) 
+        }
+    }
