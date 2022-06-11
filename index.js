@@ -22,6 +22,7 @@ let gameIsLive = false;
 let numberOfGames = 0;
 let playAgainstComputer = false;
 let computerHardMode = false;
+const BOARD_SIZE = 3;
 
 let debug = true;
 
@@ -31,14 +32,8 @@ const gameBoardArray = []; // 2D array that stores each tile object
 
 // ========== UTILITY/INTERNAL FUNCTIONS ==========
 
-// returns the DOM for the tile at the specified position
-// ex. _retrieveTile(1, 3) -> returns the top right tile
-const _getTile = (rowNum, colNum) => {
-    return gameBoardArray[rowNum - 1][colNum - 1];
-}
-
 // returns the row of tile objects specified by rowNum
-const _getRow = (rowNum) => {
+const _getRow = (rowNum) => {   
     return gameBoardArray[rowNum - 1];
 }
 
@@ -151,16 +146,23 @@ const checkVictory = (event) => {
     if (_isArrayAllEqual(_getRow(thisTile.row), "content")) { return true; }
     else if (_isArrayAllEqual(_getCol(thisTile.col), "content")) { return true; }
 
-    // only check diagonal if we have a corner tile. the row and column must both be 
+    // check diagonal if we have a corner tile. the row and column must both be 
     // some permutation of 1 and gameBoardArray.length for a corner tile.
     else if ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
             && (thisTile.col === 1 || thisTile.col === gameBoardArray.length)) {
-                if (debug) { console.log("Checking diagonal"); }
-                // check downwards diag for a tile at (1, 1) or at (length, length)
-                if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) { return true; }
+        if (debug) { console.log("Checking diagonal"); }
+        // check downwards diag for a tile at (1, 1) or at (length, length)
+        if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) { return true; }
 
-                // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
-                else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
+        // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
+        else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
+    }
+
+    // check both diagonals if we have a center tile
+    else if (thisTile.row === 2 && thisTile.col === 2) { // magic number :(
+        if (debug) { console.log("Center tile - checking both diagonals"); }
+        if (_isArrayAllEqual(_getDiagDown(), "content")) { return true; }
+        else if (_isArrayAllEqual(_getDiagUp(), "content")) { return true; }
     }
 
     // if we've made it here, all our victory checks have failed
@@ -189,7 +191,7 @@ const initializeGameBoard = () => {
     }
     while (gameBoardArray.length) { gameBoardArray.pop(); }
 
-    // generate three rows x three columns of game tiles
+    // generate the game board
     for (let row = 1; row <= 3; row++) {
         const thisRowArray = [];
         for (let col = 1; col <= 3; col++) {
@@ -202,7 +204,7 @@ const initializeGameBoard = () => {
                 if (!gameIsLive) { return; } // stop if the game isn't live
                 if (e.target.content) { return; } // stop if the tile is already occupied
 
-                if (debug) { console.log("Click successfully registered."); }
+                if (debug) { console.log("Click successfully registered"); }
                 
                 clickTile(e);
                 if (checkVictory(e)) { executeVictory(); }
@@ -223,7 +225,6 @@ const initializeGameBoard = () => {
             thisRowArray.push(thisTile);
         }
 
-        // build gameBoardArray in rows
         gameBoardArray.push(thisRowArray);
     }
 

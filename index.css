@@ -1,4 +1,5 @@
 body {
+    color: #ccc;
     text-align: center;
     background-color: #000;
     font-family: sans-serif;
@@ -6,8 +7,8 @@ body {
 
 #game-board {
     display: grid;
-    height: 600px;
-    width: 600px;
+    height: 450px;
+    width: 450px;
     margin: 100px auto;
 
     grid-template: repeat(3, 1fr) / repeat(3, 1fr);
@@ -18,5 +19,5 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 100pt;
+    font-size: 80pt;
 }
