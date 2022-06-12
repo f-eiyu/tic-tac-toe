@@ -1,14 +1,14 @@
-remaining to dos, roughly in order (R = required, O = optional, D = done):
+remaining to dos, roughly in order (R = required, O = optional, D = done, / = partial):
 
     - [D] refactor all of the aesthetic consts out of .js and into .css classes
 
     - [D] add a functional reset button
     - [D] keep track of the game stats on the front end (ex. turn count)
-    - [R] actually declare the winner instead of just halting the game
+    - [D] actually declare the winner instead of just halting the game
 
     - [O] make the front end look not horrendous
 
-    - [O] significantly refactor code to allow more cleanly for minimax AI
+    - [/] significantly refactor code to allow more cleanly for minimax AI
         - the main task is to make checkVictory() and its associated requirements
              more modular -- taking an event object as its input currently works 
              quite well, but will not work well for any sort of recursive AI

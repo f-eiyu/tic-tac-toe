@@ -124,11 +124,12 @@ const executeTie = () => { // still mostly placeholder
 // occupation, existing victory, etc., and true if the tile actually changed.
 const clickTile = (event) => {
     const thisTile = event.target;
+    if (debug) { console.log(`Clicked tile at (${thisTile.row},${thisTile.col})`); }
 
     if (!gameIsLive) { return false; }
     if (thisTile.content) { return false; }
 
-    if (debug) { console.log("Click successfully registered"); }    
+    if (debug) { console.log("Click succeeded"); }    
 
     thisTile.content = _thisMove();
 
@@ -149,11 +150,10 @@ const clickTile = (event) => {
     return true;
 }
 
-// start a fresh, brand new game of tic tac toe
-const initializeGameBoard = () => {
-    const gameBoardContainer = document.querySelector("#game-board");
+// removes everything from the game board and completely resets the game state and infobox
+const resetGameState = (gameBoardContainer) => {
+    if (debug) { console.log("Resetting game"); }
 
-    // purge a potential previous game
     while (gameBoardContainer.firstChild) {
         gameBoardContainer.removeChild(gameBoardContainer.firstChild);
     }
@@ -164,39 +164,47 @@ const initializeGameBoard = () => {
     document.querySelector("#text-next-tile").style.display = "inline";
     document.querySelector("#info-next-tile").innerText = "X";
     document.querySelector("#info-current-turn").innerText = "1";
+}
 
+// creates and initializes a new tile at (row, col) for a fresh tic-tac-toe game
+const createTile = (row, col) => {
+    const newTile = document.createElement("div");
+    newTile.classList.add("game-tile");
 
-    //determine opponent and difficulty using document.querySelector("#opponent").selectedIndex 
+    newTile.addEventListener("click", clickTile);
+    newTile.addEventListener("mouseover", hoverTile);
+    newTile.addEventListener("mouseout", unhoverTile);
 
+    newTile.content = TILE_BLANK;
+    newTile.row = row;
+    newTile.col = col;
+
+    if (debug) { console.log(`Created new tile at (${row}, ${col})`); }
+    return newTile;
+}
+
+// start a fresh, brand new game of tic tac toe
+const initializeGameBoard = () => {
+    const gameBoardContainer = document.querySelector("#game-board");
+
+    resetGameState(gameBoardContainer);
 
     // start a new game!
     for (let row = 1; row <= 3; row++) {
-        const thisRowArray = [];
-    for (let col = 1; col <= 3; col++) {
-        const thisTile = document.createElement("div");
-        thisTile.classList.add("game-tile");
+        const thisRow = [];
+        for (let col = 1; col <= 3; col++) {
+            const newTile = createTile(row, col);
 
-        thisTile.addEventListener("click", function (e) {
-            if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
-            clickTile(e);
-        });
-        thisTile.addEventListener("mouseover", hoverTile);
-        thisTile.addEventListener("mouseout", unhoverTile);
-
-        thisTile.content = TILE_BLANK;
-        thisTile.row = row;
-        thisTile.col = col;
-
-        // add the tile to the grid and keep track of it internally
-            gameBoardContainer.appendChild(thisTile);
-            thisRowArray.push(thisTile);
+            // add the tile to the grid and keep track of it internally
+            gameBoardContainer.appendChild(newTile);
+            thisRow.push(newTile);
         }
 
-        gameBoardArray.push(thisRowArray);
+        gameBoardArray.push(thisRow);
     }
 
     gameIsLive = true;
-    if (debug) { console.log("Tile framework loaded!"); }
+    if (debug) { console.log("Successfully started a new game!"); }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
