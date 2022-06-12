@@ -25,8 +25,8 @@ const unhoverTile = (event) => {
 // check for victory: search only the row, column, and maybe diagonal associated
 // with the last move that was made.
 const checkVictory = (thisTile) => {
-    // it's impossible to win before the fifth turn (turn 4 when zero-indexed)
-    if (turnCount < 5) { return; }
+    // it's impossible to win before the fifth turn
+    if (turnCount < 5) { return false; }
 
     // this slightly clunky process of building and returning victoryTiles is solely
     // to handle the aesthetics of the special case of multiple victory conditions
