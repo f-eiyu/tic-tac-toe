@@ -28,14 +28,17 @@ const unhoverTile = (event) => {
 const clickTile = (event) => {
     const thisTile = event.target;
 
-    // mark the move in the tile
     thisTile.content = _thisMove();
 
     // update the tile graphically
     thisTile.classList.add("played");
-    thisTile.innerText = `${_thisMove() === TILE_X ? "X" : "O"}`;
-
+    thisTile.innerText = `${ _thisMove() === TILE_X ? "X" : "O" }`;
+    
     turnCount++;
+
+    // update infobox
+    document.querySelector("#info-next-tile").innerText = _thisMove() === TILE_X ? "X" : "O";
+    document.querySelector("#info-current-turn").innerText = turnCount;
 }
 
 // check for victory: search only the row, column, and maybe diagonal associated
@@ -101,7 +104,8 @@ const initializeGameBoard = () => {
     //determine opponent and difficulty using document.querySelector("#opponent").selectedIndex 
 
 
-    // generate the game board
+    // start a new game!
+    document.querySelector("#info-game-count").innerText = `${numberOfGames} game${numberOfGames === 1 ? "" : "s"}`;
     for (let row = 1; row <= 3; row++) {
         const thisRowArray = [];
     for (let col = 1; col <= 3; col++) {
@@ -142,5 +146,8 @@ const initializeGameBoard = () => {
 
 document.addEventListener("DOMContentLoaded", function () {
     initializeGameBoard();
-    document.querySelector("#reset-button").addEventListener("click", initializeGameBoard);
+    document.querySelector("#reset-button").addEventListener("click", function () {
+        numberOfGames++;
+        initializeGameBoard();
+    });
 });

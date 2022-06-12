@@ -3,7 +3,7 @@ remaining to dos, roughly in order (R = required, O = optional, D = done):
     - [D] refactor all of the aesthetic consts out of .js and into .css classes
 
     - [D] add a functional reset button
-    - [R] keep track of the game stats on the front end (ex. turn count)
+    - [D] keep track of the game stats on the front end (ex. turn count)
     - [R] actually declare the winner instead of just halting the game
 
     - [O] make the front end look not horrendous
