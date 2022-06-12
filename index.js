@@ -7,6 +7,11 @@ const TILE_BLANK = 0; // falsey, to make conditionals easier later on
 const TILE_X = 1; // X and Y both truthy
 const TILE_O = 2;
 
+// constants for opponent
+const OPP_TWOPLAYER = 0;
+const OPP_COMP_EASY = 1;
+const OPP_COMP_HARD = 2;
+
 // global variables and flags
 let turnCount = 0;
 let gameIsLive = false;
@@ -180,35 +185,40 @@ const initializeGameBoard = () => {
         gameBoardContainer.removeChild(gameBoardContainer.firstChild);
     }
     while (gameBoardArray.length) { gameBoardArray.pop(); }
+    turnCount = 0;
+
+
+    //determine opponent and difficulty using document.querySelector("#opponent").selectedIndex 
+
 
     // generate the game board
     for (let row = 1; row <= 3; row++) {
         const thisRowArray = [];
-        for (let col = 1; col <= 3; col++) {
-            const thisTile = document.createElement("div");
-            thisTile.classList.add("game-tile");
+    for (let col = 1; col <= 3; col++) {
+        const thisTile = document.createElement("div");
+        thisTile.classList.add("game-tile");
 
-            thisTile.addEventListener("click", function (e) {
-                if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
-                
-                if (!gameIsLive) { return; } // stop if the game isn't live
-                if (e.target.content) { return; } // stop if the tile is already occupied
+        thisTile.addEventListener("click", function (e) {
+            if (debug) { console.log("Clicked the tile at", thisTile.row, thisTile.col); }
+            
+            if (!gameIsLive) { return; } // stop if the game isn't live
+            if (e.target.content) { return; } // stop if the tile is already occupied
 
-                if (debug) { console.log("Click successfully registered"); }
-                
-                clickTile(e);
-                if (checkVictory(e)) { executeVictory(); }
-                else if (turnCount >= 9) { executeTie(); }
-                else if (playAgainstComputer) { computerTurn(); }
-            });
-            thisTile.addEventListener("mouseover", hoverTile);
-            thisTile.addEventListener("mouseout", unhoverTile);
+            if (debug) { console.log("Click successfully registered"); }
+            
+            clickTile(e);
+            if (checkVictory(e)) { executeVictory(); }
+            else if (turnCount >= 9) { executeTie(); }
+            else if (playAgainstComputer) { computerTurn(); }
+        });
+        thisTile.addEventListener("mouseover", hoverTile);
+        thisTile.addEventListener("mouseout", unhoverTile);
 
-            thisTile.content = TILE_BLANK;
-            thisTile.row = row;
-            thisTile.col = col;
+        thisTile.content = TILE_BLANK;
+        thisTile.row = row;
+        thisTile.col = col;
 
-            // add the tile to the grid and keep track of it internally
+        // add the tile to the grid and keep track of it internally
             gameBoardContainer.appendChild(thisTile);
             thisRowArray.push(thisTile);
         }
@@ -220,7 +230,7 @@ const initializeGameBoard = () => {
     if (debug) { console.log("Tile framework loaded!"); }
 }
 
-
-
-
-initializeGameBoard();
+document.addEventListener("DOMContentLoaded", function () {
+    initializeGameBoard();
+    document.querySelector("#reset-button").addEventListener("click", initializeGameBoard);
+});
