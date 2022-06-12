@@ -11,9 +11,9 @@ const OPP_COMP_EASY = 1;
 const OPP_COMP_HARD = 2;
 
 // global variables and flags
-let turnCount = 0;
+let turnCount = 1;
 let gameIsLive = false;
-let numberOfGames = 0;
+let gamesCompleted = 0;
 let playAgainstComputer = false;
 let computerHardMode = false;
 const BOARD_SIZE = 3;

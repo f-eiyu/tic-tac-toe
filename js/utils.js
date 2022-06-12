@@ -43,7 +43,7 @@ const _getDiagUp = () => {
 
 // returns whether the current move is X or O, in the form of the TILE_ constant
 const _thisMove = () => {
-    return (turnCount % 2 === 0 ? TILE_X : TILE_O);
+    return (turnCount % 2 === 1 ? TILE_X : TILE_O);
 }
 
 // returns true if the specified property of every element in toCheck is the
