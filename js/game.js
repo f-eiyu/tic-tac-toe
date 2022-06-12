@@ -105,9 +105,9 @@ const executeVictory = (winningTiles) => {
 
 // end the game and displays a tie message
 const executeTie = () => { // still mostly placeholder
-    if (debug) { console.log("Tie game reached"); }
-
     if (turnCount < 9) { return false; }
+
+    if (debug) { console.log("Tie game reached"); }
 
     // bookkeeping
     gameIsLive = false;
