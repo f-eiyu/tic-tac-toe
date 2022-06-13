@@ -1,9 +1,4 @@
-const computerTile = TILE_X;
-
-// some temporary functions rewritten to enable me to test the minimax AI.
-// when my minimax work is done, the rewritten versions will be refactored
-// into the main game code, and the main game code will be cleaned up and
-// improved alongside.
+// takes an array of TILEs and checks if they're all the same
 const _checkVectorForVictory = (toCheck) => {
     // due to the transitive property, it's sufficient to compare each
     // element to the first element.
@@ -71,6 +66,8 @@ const checkBoardForVictor = (boardState, turnNum) => {
     // it's impossible to win before the fifth turn
     if (turnNum < 5) { return false; }
 
+    debugLog("Checking for victory");
+
     // this slightly clunky process of building and returning victoryTiles is solely
     // to handle the aesthetics of the special case of multiple victory conditions
     // being met simultaneously. for instance, the following
@@ -83,14 +80,15 @@ const checkBoardForVictor = (boardState, turnNum) => {
     // if it is achieved.
     const victoryTiles = [];
 
-    // check rows
+    debugLog("Checking rows");
     for (let row = 0; row < boardState.length; row++) {
         if (_checkVectorForVictory(boardState[row])) {
             victoryTiles.push(..._getRowCoords(boardState, row));
+            debugLog("Row victory found");
         }
     }
 
-    // check columns
+    debugLog("Checking columns");
     for (let col = 0; col < boardState[0].length; col++) {
         const thisCol = [];
         for (let row = 0; row < boardState.length; row++) {
@@ -99,10 +97,11 @@ const checkBoardForVictor = (boardState, turnNum) => {
 
         if (_checkVectorForVictory(thisCol)) {
             victoryTiles.push(..._getColCoords(boardState, col));
+            debugLog("Column victory found");
         }
     }
 
-    // check descending diagonal
+    debugLog("Checking descending diagonal");
     const diagDown = [];
     for (let rowCol = 0; rowCol < boardState.length; rowCol++) {
         diagDown.push(boardState[rowCol][rowCol]);
@@ -110,9 +109,10 @@ const checkBoardForVictor = (boardState, turnNum) => {
 
     if (_checkVectorForVictory(diagDown)) {
         victoryTiles.push(..._getDiagDownCoords(boardState));
+        debugLog("Descending diagonal victory found");
     }
 
-    // check ascending diagonal
+    debugLog("Chhecking ascending diagonal");
     const diagUp = [];
     for (let rowCol = 0; rowCol < boardState.length; rowCol++) {
         diagUp.push(boardState[rowCol][boardState.length - rowCol - 1]);
@@ -120,6 +120,7 @@ const checkBoardForVictor = (boardState, turnNum) => {
 
     if (_checkVectorForVictory(diagUp)) {
         victoryTiles.push(..._getDiagUpCoords(boardState));
+        debugLog("Ascending diagonal victory found");
     }
 
     if (!victoryTiles.length) { return false; }
@@ -127,6 +128,8 @@ const checkBoardForVictor = (boardState, turnNum) => {
 }
 
 const executeMinimax = (virtualGameBoard, turnNum) => {
+    debugLog(`  Minimax recursion function reached turn number ${turnNum}`);
+
     // first, check the current state of the board, and if it's already a game
     // end, return the result of that game
     let gameIsWon = checkBoardForVictor(virtualGameBoard);
@@ -168,6 +171,7 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
             }
         }
 
+        debugLog(`Minimax selected the move ${possibleMoves[bestIndex]}`);
         return possibleMoves[bestIndex];
     } else { // maximize on the AI's turns and minimize on the player's turns
         return (computerTile === _thisMoveDebug(turnNum) ?
@@ -187,13 +191,14 @@ const executeRandomAI = (virtualGameBoard) => {
         }
     }
 
-    // select and return one at random
-    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; 
+    // select a move at random
+    const thisMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+    debugLog(`Computer randomly selected the move ${thisMove}`);
+    return thisMove; 
 }
 
 const decideComputerAction = () => {
-    if (!playAgainstComputer) { return false; }
-
+    debugLog("The computer is thinking");
     // makes a copy of the current game board for the AI's scratch work
     const virtualGameBoard = [];
     for (row of gameBoardArray) {
@@ -212,5 +217,9 @@ const decideComputerAction = () => {
 }
 
 const computerTurn = () => {
+    if (!playAgainstComputer) { return false; }
 
+    const thisAction = decideComputerAction();
+
+    turnCounter++;
 }

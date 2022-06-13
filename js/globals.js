@@ -11,6 +11,7 @@ const OPP_COMP_EASY_X = 1;
 const OPP_COMP_EASY_O = 2;
 const OPP_COMP_HARD_X = 3;
 const OPP_COMP_HARD_O = 4;
+const computerTile = TILE_X;
 
 // global variables and flags
 let turnCounter = 1;
@@ -21,6 +22,5 @@ let computerHardMode = false;
 const BOARD_SIZE = 3;
 
 const debug = false;
-const debugAI = true;
 
 const gameBoardArray = []; // 2D array that stores each tile object

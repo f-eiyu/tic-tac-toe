@@ -56,3 +56,7 @@ const _isArrayAllEqual = (toCheck, property) => {
     });
 
 }
+
+const debugLog = (str) => {
+    if (debug) { console.log(str); };
+}

@@ -41,7 +41,7 @@ const checkVictory = (thisTile) => {
     const victoryTiles = [];
     
     // always check row and column
-    if (debug) { console.log("Checking row and column"); }
+    debugLog("Checking row and column");
 
     if (_isArrayAllEqual(_getRow(thisTile.row), "content")) {
         victoryTiles.push(..._getRow(thisTile.row));
@@ -54,7 +54,7 @@ const checkVictory = (thisTile) => {
     // some permutation of 1 and gameBoardArray.length for a corner tile.
     if ((thisTile.row === 1 || thisTile.row === gameBoardArray.length)
      && (thisTile.col === 1 || thisTile.col === gameBoardArray.length)) {
-        if (debug) { console.log("Checking a diagonal"); }
+        debugLog("Checking a diagonal");
 
         // check downwards diag for a tile at (1, 1) or at (length, length)
         if (thisTile.row === thisTile.col && _isArrayAllEqual(_getDiagDown(), "content")) {
@@ -69,7 +69,7 @@ const checkVictory = (thisTile) => {
 
     // check both diagonals if we have a center tile
     else if (thisTile.row === 2 && thisTile.col === 2) { // magic number :(
-        if (debug) { console.log("Center tile played - checking both diagonals"); }
+        debugLog("Center tile played - checking both diagonals");
 
         if (_isArrayAllEqual(_getDiagDown(), "content")) {
              victoryTiles.push(..._getDiagDown());
@@ -87,7 +87,7 @@ const checkVictory = (thisTile) => {
 const executeVictory = (winningTiles) => {
     if (!winningTiles) { return false; }
     
-    if (debug) { console.log("Victory reached:\n", winningTiles); }
+    debugLog("Victory reached:\n", winningTiles);
 
     // bookkeeping
     gameIsLive = false;
@@ -107,7 +107,7 @@ const executeVictory = (winningTiles) => {
 const executeTie = () => { // still mostly placeholder
     if (turnCounter < 9) { return false; }
 
-    if (debug) { console.log("Tie game reached"); }
+    debugLog("Tie game reached");
 
     // bookkeeping
     gameIsLive = false;
@@ -124,12 +124,12 @@ const executeTie = () => { // still mostly placeholder
 // occupation, existing victory, etc., and true if the tile actually changed.
 const clickTile = (event) => {
     const thisTile = event.target;
-    if (debug) { console.log(`Clicked tile at (${thisTile.row},${thisTile.col})`); }
+    debugLog(`Clicked tile at (${thisTile.row},${thisTile.col})`);
 
     if (!gameIsLive) { return false; }
     if (thisTile.content) { return false; }
 
-    if (debug) { console.log("Click succeeded"); }    
+    debugLog("Click succeeded");    
 
     thisTile.content = _thisMove();
 
@@ -152,7 +152,7 @@ const clickTile = (event) => {
 
 // removes everything from the game board and completely resets the game state and infobox
 const resetGameState = (gameBoardContainer) => {
-    if (debug) { console.log("Resetting game"); }
+    debugLog("Resetting game");
 
     while (gameBoardContainer.firstChild) {
         gameBoardContainer.removeChild(gameBoardContainer.firstChild);
@@ -179,7 +179,7 @@ const createTile = (row, col) => {
     newTile.row = row;
     newTile.col = col;
 
-    if (debug) { console.log(`Created new tile at (${row}, ${col})`); }
+    debugLog(`Created new tile at (${row}, ${col})`);
     return newTile;
 }
 
@@ -235,7 +235,7 @@ const initializeGameBoard = () => {
     }
 
     gameIsLive = true;
-    if (debug) { console.log("Successfully started a new game!"); }
+    debugLog("Successfully started a new game!");
 
     // if computer is X, make its move here
 }
