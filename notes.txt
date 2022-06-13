@@ -89,20 +89,3 @@ explaining the minimax algorithm to myself
     - for tic-tac-toe, the algorithm will win if it can, but in some interpretation, it's not
       necessarily trying to win explicitly. we can think about it as trying to dodge a loss until
       a victory option is clear -- another way to think about "best worst-case outcome".
-
-
-    rough minimax pseudocode. we'll treat a victory as +1 point for the maximizer and a loss as -1
-    point for the maximizer.
-    
-    function minimax(board state) {
-        find all possible moves on the current board
-
-        for (each possible move) {
-            if (win) return 1;
-            else if (loss) return -1;
-            else if (tie) return 0;
-
-            else // the next move doesn't win, lose or tie
-                minimax(next board state) 
-        }
-    }
