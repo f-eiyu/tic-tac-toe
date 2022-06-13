@@ -1,4 +1,4 @@
-// takes an array of TILEs and checks if they're all the same
+// takes an array of TILE_ and checks if they're all the same
 const _checkVectorForVictory = (toCheck) => {
     // due to the transitive property, it's sufficient to compare each
     // element to the first element.
@@ -9,6 +9,7 @@ const _checkVectorForVictory = (toCheck) => {
     });
 }
 
+// return the coordinates of every tile in row rowNum
 const _getRowCoords = (toGetFrom, rowNum) => {   
     const fetchedRow = [];
     for (let colNum = 0; colNum < toGetFrom[rowNum].length; colNum++) {
@@ -18,6 +19,7 @@ const _getRowCoords = (toGetFrom, rowNum) => {
     return fetchedRow;
 }
 
+// returns the coordinates of every tile in column colNum
 const _getColCoords = (toGetFrom, colNum) => {
     const fetchedCol = [];
 
@@ -28,6 +30,7 @@ const _getColCoords = (toGetFrom, colNum) => {
     return fetchedCol;
 }
 
+// returns the coordinates of every tile in the downwards diagonal
 const _getDiagDownCoords = (toGetFrom) => {
     const fetchedDiag = [];
 
@@ -38,6 +41,7 @@ const _getDiagDownCoords = (toGetFrom) => {
     return fetchedDiag;
 }
 
+// returns the coordinates of every tile in the upwards diagonal
 const _getDiagUpCoords = (toGetFrom) => {
     const fetchedDiag = [];
 
@@ -49,35 +53,31 @@ const _getDiagUpCoords = (toGetFrom) => {
     return fetchedDiag;
 }
 
-function _getContentsDebug(boardState, toGet) {
-    const fetchedTiles = [];
-    for (coord of toGet) {
-        fetchedTiles.push(boardState[coord[0]][coord[1]]);
-    }
-    
-    return fetchedTiles;
-}
-
+// returns the TILE_ constant indicating whether the current move is X or O
 const _thisMoveDebug = (thisTurnNum) => {
     return (thisTurnNum % 2 === 1 ? TILE_X : TILE_O);
 }
 
+// looks at the current state of the game board and checks if either player has
+// achieved victory. returns false if the board does not contain a victory, and
+// returns an array containing the victorious tiles otherwise.
 const checkBoardForVictor = (boardState, turnNum) => {
     // it's impossible to win before the fifth turn
     if (turnNum < 5) { return false; }
 
     debugLog("Checking for victory");
 
-    // this slightly clunky process of building and returning victoryTiles is solely
-    // to handle the aesthetics of the special case of multiple victory conditions
-    // being met simultaneously. for instance, the following
+    // this slightly clunky process of building/returning victoryTiles is solely
+    // to handle the aesthetics of multiple victory conditions being met
+    // simultaneously. for instance, the following
     //
     //     X X X
     //     X O O
     //     X O O
     //
-    // is unlikely, but should highlight both the winning row and winning column
-    // if it is achieved.
+    // is unlikely, but the game should highlight both the winning row 
+    // winning column if it is achieved, so it needs to "remember" both sets
+    // of winning tiles.
     const victoryTiles = [];
 
     debugLog("Checking rows");
@@ -112,7 +112,7 @@ const checkBoardForVictor = (boardState, turnNum) => {
         debugLog("Descending diagonal victory found");
     }
 
-    debugLog("Chhecking ascending diagonal");
+    debugLog("Checking ascending diagonal");
     const diagUp = [];
     for (let rowCol = 0; rowCol < boardState.length; rowCol++) {
         diagUp.push(boardState[rowCol][boardState.length - rowCol - 1]);
@@ -127,12 +127,14 @@ const checkBoardForVictor = (boardState, turnNum) => {
     else { return boardState[victoryTiles[0][0]][victoryTiles[0][1]]; }
 }
 
-const executeMinimax = (virtualGameBoard, turnNum) => {
-    debugLog(`  Minimax recursion function reached turn number ${turnNum}`);
+// given a boardState, recursively finds all possible future moves and assigns
+// the move a numerical value based on whether it leads to victory
+const executeMinimax = (boardState, turnNum) => {
+    debugLog(`  Minimax recursion: turn number ${turnNum}`);
 
     // first, check the current state of the board, and if it's already a game
-    // end, return the result of that game
-    let gameIsWon = checkBoardForVictor(virtualGameBoard);
+    // end, return the result of that game.
+    let gameIsWon = checkBoardForVictor(boardState);
     if (gameIsWon) { return (gameIsWon === computerTile ? 1 : -1); }
     // check for a tie afterwards, and return zero if so
     if (turnNum > 9) { return 0; }
@@ -140,9 +142,9 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
     // if the game is still going, elucidate all remaining moves this turn
     const possibleMoves =  []; // array of [row, col]
     const possibleScores = []; // array of scores, respective to possibleMoves
-    for (let row = 0; row < virtualGameBoard.length; row++) {
-        for (let col = 0; col < virtualGameBoard[row].length; col++) {
-            if (virtualGameBoard[row][col] === TILE_BLANK) {
+    for (let row = 0; row < boardState.length; row++) {
+        for (let col = 0; col < boardState[row].length; col++) {
+            if (boardState[row][col] === TILE_BLANK) {
                 possibleMoves.push([row, col]);
                 possibleScores.push(null);
             }
@@ -151,19 +153,32 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
 
     // make each possible move and find a score for it by recursing minimax
     for (let moveIndex = 0; moveIndex < possibleMoves.length; moveIndex++) {
-        const thisGameBoard = structuredClone(virtualGameBoard);
+        const thisGameBoard = structuredClone(boardState);
         const thisMove = possibleMoves[moveIndex]; // [row, col]
 
         thisGameBoard[thisMove[0]][thisMove[1]] = _thisMoveDebug(turnNum);
         possibleScores[moveIndex] = executeMinimax(thisGameBoard, turnNum + 1);
+
+        // the minimax algorithm can be condensed for tic-tac-toe: due to the
+        // simplicity of the game, the search can simply end if a +1 is found
+        // for the maximizer or a -1 is found for the minimizer, because we will
+        // never need to take any other option (ie. any remaining, unchecked,
+        // options wil be, at best, equally optimal to the one we already have).
+        if (possibleScores[moveIndex] === (computerTile === _thisMoveDebug(turnNum) ? 1 : -1)) {
+            // if the recursion depth is 1, decideComputerAction() needs a move;
+            // otherwise, the algorithm only needs a score to be returned
+            if (turnNum === turnCounter) {
+                debugLog(`Minimax selected the move ${possibleMoves[moveIndex]}`);
+                return possibleMoves[moveIndex];
+            }
+            return possibleScores[moveIndex];
+        }
     }
 
-    // when we're at the minimum recursion depth, we need to return which move
-    // to make to the parent function; however, any further in the tree and
-    // we don't care about *which* move is which, specifically -- only about
-    // how good/bad the outcomes are. thus, we don't bother returning the
-    // tile coords at all in that case, since only the score matters.
-    if (turnNum === turnCounter) {
+    // we make it here if no move leads to a guaranteed victory (for maximizer)
+    // or loss (for minimizer), so in this case we simply want to return the
+    // most optimal option that remains.
+    if (turnNum === turnCounter) { // again, decideComputerAction() needs a move
         let bestIndex = 0;
         for (let moveIndex = 0; moveIndex < possibleMoves.length; moveIndex++) {
             if (possibleScores[moveIndex] > possibleScores[bestIndex]) {
@@ -180,6 +195,7 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
     }
 }
 
+// returns a random empty tile from the array of currently empty tiles
 const executeRandomAI = (virtualGameBoard) => {
     // elucidate all remaining moves
     const possibleMoves = [];
@@ -197,6 +213,7 @@ const executeRandomAI = (virtualGameBoard) => {
     return thisMove; 
 }
 
+// returns the result of minimax for a smart AI, or a random tile for a dumb one
 const decideComputerAction = () => {
     debugLog("The computer is thinking");
     // makes a copy of the current game board for the AI's scratch work
@@ -216,6 +233,7 @@ const decideComputerAction = () => {
     }
 }
 
+// lets the computer make a move!
 const computerTurn = () => {
     if (!playAgainstComputer) { return false; }
 
