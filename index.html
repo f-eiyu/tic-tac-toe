@@ -9,16 +9,18 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
-        <h1>Tic Tac Toe!</h1>
+        <h1>tic tac toe</h1>
+        
         <div id="game-container">
+            <div id="player-waitstate-cover"></div>
             <div id="game-board"></div>
             <div id="infobox">
                 <p class="infobox-entry">
-                    <span id="text-next-tile">The next tile will be <span id="info-next-tile">X</span>.</span>
-                    <span id="text-victory">Player <span id="text-winning-player">X</span> has won the game!</span>
-                    <span id="text-tie">The game was a draw!</span></p>
-                <p class="infobox-entry">The current turn is <span id="info-current-turn">1</span>.</p>
-                <p class="infobox-entry">You have completed <span id="info-game-count">0 games</span>.</p>
+                    <span id="text-next-tile">The next tile will be <span class="info-text" id="info-next-tile">X</span>.</span>
+                    <span id="text-victory">Player <span class="info-text" id="text-winning-player">X</span> has won the game!</span>
+                    <span class="info-text" id="text-tie">The game was a draw!</span></p>
+                <p class="infobox-entry">The current turn is <span class="info-text" id="info-current-turn">1</span>.</p>
+                <p class="infobox-entry">You have completed <span class="info-text" id="info-game-count">0 games</span>.</p>
                 <p class="infobox-entry"></p>
 
                 <div id="reset-box">

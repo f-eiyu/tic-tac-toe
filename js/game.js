@@ -59,6 +59,11 @@ const executeTie = () => { // still mostly placeholder
     document.querySelector("#text-tie").style.display = "inline";
     document.querySelector("#text-next-tile").style.display = "none";
     document.querySelector("#info-game-count").innerText = `${gamesCompleted} game${gamesCompleted === 1 ? "" : "s"}`;
+    for (row of gameBoardDOMTiles) {
+        for (tile of row) {
+            tile.classList.add("tie");
+        }
+    }
 
     return true;
 }

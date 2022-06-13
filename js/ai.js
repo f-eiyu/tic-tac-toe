@@ -114,7 +114,14 @@ const decideComputerAction = () => {
 const computerTurn = () => {
     if (!playAgainstComputer) { return false; }
 
-    const thisAction = decideComputerAction();
+    // disable player input
+    const playerWaitstateCover = document.querySelector("#player-waitstate-cover");
+    playerWaitstateCover.style.display = "block";
 
-    playTile(gameBoardDOMTiles[thisAction[0]][thisAction[1]]);
+    // gives the computer a delay
+    setTimeout(function () { // move and reenable player input
+        const thisAction = decideComputerAction();
+        playerWaitstateCover.style.display = "none";
+        playTile(gameBoardDOMTiles[thisAction[0]][thisAction[1]]);
+    }, (10 - turnCounter) * 150);
 }

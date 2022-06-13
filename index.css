@@ -2,7 +2,7 @@ body {
     color: #ccc;
     text-align: center;
     background-color: #000;
-    font-family: sans-serif;
+    font-family: monospace;
 }
 
 h1 {
@@ -14,9 +14,19 @@ h1 {
     display: grid;
     grid-template: 1fr / 1fr 1fr 1fr;
 
-    max-width: 1200px;
+    width: 1200px;
     margin: auto;
     user-select: none;
+}
+
+#player-waitstate-cover {
+    display: none;
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    margin-left: 286px;
+    margin-top: 112px;
+    background-color: rgba(148, 148, 255, 0.3);
 }
 
 #game-board {
@@ -30,15 +40,20 @@ h1 {
     grid-gap: 1%;
 
     order: 1;
+
+    padding: 10px;
+    border: solid #888 2px;
 }
 
 #infobox {
     display: inline-flex;
     text-align: left;
-    height: 180px;
-    width: 330px;
+    height: 190px;
+    width: 400px;
     margin: auto;
-    border: solid white 1px;
+    border: solid #888 1px;
+    border-radius: 10px;
+    font-size: 1.25em;
 
     flex-direction: column;
     justify-content: space-evenly;
@@ -54,8 +69,25 @@ h1 {
 }
 
 #text-victory, #text-tie {
-    font-weight: bold;
     display: none;
+}
+
+.info-text {
+    font-weight: bold;
+}
+
+select, #reset-button {
+    font-family: monospace;
+    background-color: #AAA;
+}
+
+#reset-button:hover {
+    background-color: #777;
+}
+
+select:hover {
+    border: 1px solid #CCC;
+    border-radius: 1px;
 }
 
 .game-tile {
@@ -63,13 +95,14 @@ h1 {
     justify-content: center;
     align-items: center;
     font-size: 80pt;
+    font-family: sans-serif;
 
     color: #000;
     background-color: #ccc;
 }
 
 .hovered {
-    color: #888;
+    color: #777;
     background-color: #AAA;
 }
 
@@ -81,4 +114,9 @@ h1 {
 .victory {
     color: darkgreen;
     background-color: lightgreen;
+}
+
+.tie {
+    color: #444;
+    background-color: #AAA;
 }
