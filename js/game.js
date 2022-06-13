@@ -26,7 +26,7 @@ const unhoverTile = (event) => {
 // with the last move that was made.
 const checkVictory = (thisTile) => {
     // it's impossible to win before the fifth turn
-    if (turnCount < 5) { return false; }
+    if (turnCounter < 5) { return false; }
 
     // this slightly clunky process of building and returning victoryTiles is solely
     // to handle the aesthetics of the special case of multiple victory conditions
@@ -105,7 +105,7 @@ const executeVictory = (winningTiles) => {
 
 // end the game and displays a tie message
 const executeTie = () => { // still mostly placeholder
-    if (turnCount < 9) { return false; }
+    if (turnCounter < 9) { return false; }
 
     if (debug) { console.log("Tie game reached"); }
 
@@ -141,11 +141,11 @@ const clickTile = (event) => {
     if (executeVictory(checkVictory(thisTile))) { return true; }
     if (executeTie()) { return true; }
         
-    turnCount++;
+    turnCounter++;
 
     // update infobox
     document.querySelector("#info-next-tile").innerText = _thisMove() === TILE_X ? "X" : "O";
-    document.querySelector("#info-current-turn").innerText = turnCount;
+    document.querySelector("#info-current-turn").innerText = turnCounter;
     
     return true;
 }
@@ -158,7 +158,7 @@ const resetGameState = (gameBoardContainer) => {
         gameBoardContainer.removeChild(gameBoardContainer.firstChild);
     }
     while (gameBoardArray.length) { gameBoardArray.pop(); }
-    turnCount = 1;
+    turnCounter = 1;
     document.querySelector("#text-victory").style.display = "none";
     document.querySelector("#text-tie").style.display = "none";
     document.querySelector("#text-next-tile").style.display = "inline";
