@@ -183,11 +183,42 @@ const createTile = (row, col) => {
     return newTile;
 }
 
+// toggles flags for the type of game the player selected
+const determineGameType = () => {
+    switch (document.querySelector("#opponent").selectedIndex) {
+        case OPP_COMP_EASY_X:
+            playAgainstComputer = true;
+            computerHardMode = false;
+            computerTile = TILE_X;
+            break;
+        case OPP_COMP_EASY_O:
+            playAgainstComputer = true;
+            computerHardMode = false;
+            computerTile = TILE_O;
+            break;
+        case OPP_COMP_HARD_X:
+            playAgainstComputer = true;
+            computerHardMode = true;
+            computerTile = TILE_X;
+            break;
+        case OPP_COMP_HARD_O:
+            playAgainstComputer = true;
+            computerHardMode = true;
+            computerTile = TILE_O;
+        case OPP_TWOPLAYER:
+        default:
+            playAgainstComputer = false;
+            computerHardMode = false;
+            break;
+    }
+}
+
 // start a fresh, brand new game of tic tac toe
 const initializeGameBoard = () => {
     const gameBoardContainer = document.querySelector("#game-board");
 
     resetGameState(gameBoardContainer);
+    determineGameType();
 
     // start a new game!
     for (let row = 1; row <= 3; row++) {
@@ -205,6 +236,8 @@ const initializeGameBoard = () => {
 
     gameIsLive = true;
     if (debug) { console.log("Successfully started a new game!"); }
+
+    // if computer is X, make its move here
 }
 
 document.addEventListener("DOMContentLoaded", function () {

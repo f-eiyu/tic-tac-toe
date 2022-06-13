@@ -10,8 +10,10 @@ remaining to dos, roughly in order (R = required, O = optional, D = done, / = pa
 
     - [/] significantly refactor code to allow more cleanly for minimax AI
         - the main task is to make checkVictory() and its associated requirements
-             more modular -- taking an event object as its input currently works 
+             more modular -- taking an event object as its input currently works
              quite well, but will not work well for any sort of recursive AI
+        - implement all changes into the main game.js framework -- notably, the
+          grid is now zero-indexed in code instead of one-indexed
 
 
 ----------

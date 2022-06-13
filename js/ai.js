@@ -1,9 +1,3 @@
-// let the computer play a tile!
-const computerTurn = () => { // placeholder
-    return;
-}
-
-
 const computerTile = TILE_X;
 
 // some temporary functions rewritten to enable me to test the minimax AI.
@@ -13,8 +7,8 @@ const computerTile = TILE_X;
 const _checkVectorForVictory = (toCheck) => {
     // due to the transitive property, it's sufficient to compare each
     // element to the first element.
-    // thisElement is falsey if the tile is blank, so this function will
-    // always return false if a blank tile is involved.
+    // TILE_BLANK is falsey, so this function will immediately fail if any of
+    // the tiles being checked is blank.
     return toCheck.every( function(thisElement) {
         return (thisElement && thisElement === toCheck[0]);
     });
@@ -128,65 +122,8 @@ const checkBoardForVictor = (boardState, turnNum) => {
         victoryTiles.push(..._getDiagUpCoords(boardState));
     }
 
-
-    // let rowTiles = _getRowCoords(boardState, playedRow);
-    // let colTiles = _getColCoords(boardState, playedCol);
-    // let diagDownTiles = _getDiagDownCoords(boardState);
-    // let diagUpTiles = _getDiagUpCoords(boardState);
-    
-    // if (debug) { console.log("Checking rows"); }
-    // if (_checkVectorForVictory(_getContentsDebug(boardState, _getRowCoords(boardState, row)))) {
-    //     if (debug) { console.log("Row victory"); }
-    //     victoryTiles.push(...rowTiles);
-    // }
-
-    // if (debug) { console.log("Checking columns"); }
-    // if (_checkVectorForVictory(_getContentsDebug(boardState, colTiles))) {
-    //     if (debug) { console.log("Column victory"); }
-    //     victoryTiles.push(...colTiles);
-    //  }
-
-    // // if the row coordinate equals the column coordinate, we're always on the downwards diagonal
-    //  if (playedRow === playedCol) {
-    //     if (debug) { console.log("Checking downwards diagonal"); }
-
-    //     if (_checkVectorForVictory(_getContentsDebug(boardState, diagDownTiles))) {
-    //         if (debug) { console.log("Downwards diagonal victory"); }
-
-    //         victoryTiles.push(...diagDownTiles);
-    //     }
-    //  }
-
-    //  // if the row + column coordinates equal the board size, we're on the upwards diagonal
-    //  if (playedRow + playedCol === boardState.length - 1) {
-    //     if (debug) { console.log("Checking upwards diagonal"); }
-
-    //     if (_checkVectorForVictory(_getContentsDebug(boardState, diagUpTiles))) {
-    //         if (debug) { console.log("Upwards diagonal victory"); }
-
-    //         victoryTiles.push(...diagUpTiles);
-    //     }
-    //  }
-
     if (!victoryTiles.length) { return false; }
     else { return boardState[victoryTiles[0][0]][victoryTiles[0][1]]; }
-}
-
-
-const minimaxContainer = () => {
-    // creates an array representation of the current board
-
-    const virtualGameBoard = [];
-    for (row of gameBoardArray) {
-        const thisVirtualRow = [];
-        for (col of row) {
-            thisVirtualRow.push(col.content);
-        }
-        virtualGameBoard.push(thisVirtualRow);
-    }
-
-    // the recursion will manipulate and test copies of the virtual game board, not the real one
-      console.log(executeMinimax(virtualGameBoard, turnCounter));
 }
 
 const executeMinimax = (virtualGameBoard, turnNum) => {
@@ -218,11 +155,11 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
         possibleScores[moveIndex] = executeMinimax(thisGameBoard, turnNum + 1);
     }
 
-    console.log(possibleMoves, possibleScores, turnNum);
     // when we're at the minimum recursion depth, we need to return which move
     // to make to the parent function; however, any further in the tree and
-    // we don't care about which move is which specifically -- only how good/bad
-    // the options are.
+    // we don't care about *which* move is which, specifically -- only about
+    // how good/bad the outcomes are. thus, we don't bother returning the
+    // tile coords at all in that case, since only the score matters.
     if (turnNum === turnCounter) {
         let bestIndex = 0;
         for (let moveIndex = 0; moveIndex < possibleMoves.length; moveIndex++) {
@@ -232,7 +169,48 @@ const executeMinimax = (virtualGameBoard, turnNum) => {
         }
 
         return possibleMoves[bestIndex];
-    } else {
-        return (computerTile === _thisMoveDebug(turnNum) ? Math.max(...possibleScores) : Math.min(...possibleScores));
+    } else { // maximize on the AI's turns and minimize on the player's turns
+        return (computerTile === _thisMoveDebug(turnNum) ?
+            Math.max(...possibleScores) :
+            Math.min(...possibleScores));
     }
+}
+
+const executeRandomAI = (virtualGameBoard) => {
+    // elucidate all remaining moves
+    const possibleMoves = [];
+    for (let row = 0; row < virtualGameBoard.length; row++) {
+        for (let col = 0; col < virtualGameBoard[row].length; col++) {
+            if (virtualGameBoard[row][col] === TILE_BLANK) {
+                possibleMoves.push([row, col]);
+            }
+        }
+    }
+
+    // select and return one at random
+    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; 
+}
+
+const decideComputerAction = () => {
+    if (!playAgainstComputer) { return false; }
+
+    // makes a copy of the current game board for the AI's scratch work
+    const virtualGameBoard = [];
+    for (row of gameBoardArray) {
+        const thisVirtualRow = [];
+        for (col of row) {
+            thisVirtualRow.push(col.content);
+        }
+        virtualGameBoard.push(thisVirtualRow);
+    }
+
+    if (computerHardMode) {
+        return executeMinimax(virtualGameBoard, turnCounter);
+    } else {
+        return executeRandomAI(virtualGameBoard);
+    }
+}
+
+const computerTurn = () => {
+
 }

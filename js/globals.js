@@ -7,8 +7,10 @@ const TILE_O = 2;
 
 // constants for opponent
 const OPP_TWOPLAYER = 0;
-const OPP_COMP_EASY = 1;
-const OPP_COMP_HARD = 2;
+const OPP_COMP_EASY_X = 1;
+const OPP_COMP_EASY_O = 2;
+const OPP_COMP_HARD_X = 3;
+const OPP_COMP_HARD_O = 4;
 
 // global variables and flags
 let turnCounter = 1;
