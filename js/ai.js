@@ -8,7 +8,7 @@ const computerTurn = () => { // placeholder
 // when my minimax work is done, the rewritten versions will be refactored
 // into the main game code, and the main game code will be cleaned up and
 // improved alongside.
-const _isArrayAllEqualDebug = (toCheck) => {
+const _isVictoriousDebug = (toCheck) => {
     // due to the transitive property, it's sufficient to compare each
     // element to the first element.
     // thisElement is falsey if the tile is blank, so this function will
@@ -19,38 +19,52 @@ const _isArrayAllEqualDebug = (toCheck) => {
 }
 
 const _getRowDebug = (toGetFrom, rowNum) => {   
-    return toGetFrom[rowNum];
+    const fetchedRow = [];
+    for (let colNum = 0; colNum < toGetFrom[rowNum].length; colNum++) {
+        fetchedRow.push([rowNum, colNum]);
+    }
+
+    return fetchedRow;
 }
 
 const _getColDebug = (toGetFrom, colNum) => {
-    const thisCol = [];
+    const fetchedCol = [];
 
-    for (row of toGetFrom) {
-        thisCol.push(row[colNum]);
+    for (let rowNum = 0; rowNum < toGetFrom.length; rowNum++) {
+        fetchedCol.push([rowNum, colNum]);
     }
 
-    return thisCol;
+    return fetchedCol;
 }
 
 const _getDiagDownDebug = (toGetFrom) => {
-    const thisDiag = [];
+    const fetchedDiag = [];
 
     for (let rowCol = 0; rowCol < toGetFrom.length; rowCol++) {
-        thisDiag.push(toGetFrom[rowCol][rowCol]);
+        fetchedDiag.push([rowCol, rowCol]);
     }
 
-    return thisDiag;
+    return fetchedDiag;
 }
 
 const _getDiagUpDebug = (toGetFrom) => {
-    const thisDiag = [];
+    const fetchedDiag = [];
 
     for (let row = 0; row < toGetFrom.length; row++) {
         const col = toGetFrom[row].length - row - 1;
-        thisDiag.push(toGetFrom[row][col]);
+        fetchedDiag.push([row, col]);
     }
 
-    return thisDiag;
+    return fetchedDiag;
+}
+
+const _getContentsDebug = (boardState, arguments) => {
+    const fetchedTiles = [];
+    for (coord of arguments) {
+        fetchedTiles.push(boardState[coord[0]][coord[1]]);
+    }
+    
+    return fetchedTiles;
 }
 
 const checkVictoryDebug = (boardState, playedCoordinates) => {
@@ -70,46 +84,46 @@ const checkVictoryDebug = (boardState, playedCoordinates) => {
     const victoryTiles = [];
     const playedRow = playedCoordinates[0];
     const playedCol = playedCoordinates[1];
+
+    let rowTiles = _getRowDebug(boardState, playedRow);
+    let colTiles = _getColDebug(boardState, playedCol);
+    let diagDownTiles = _getDiagDownDebug(boardState);
+    let diagUpTiles = _getDiagUpDebug(boardState);
     
     // always check row and column
-    if (debug) { console.log("Checking row and column"); }
+    if (debug) { console.log("Checking row"); }
 
-    if (_isArrayAllEqualDebug(_getRowDebug(boardState, playedRow))) {
-        victoryTiles.push(..._getRowDebug(boardState, playedRow));
+    if (_isVictoriousDebug(_getContentsDebug(boardState, rowTiles))) {
+        console.log("Row victory");
+        victoryTiles.push(...rowTiles);
     }
-    if (_isArrayAllEqualDebug(_getColDebug(boardState, playedCol))) {
-        victoryTiles.push(..._getColDebug(boardState, playedCol));
+
+    if (_isVictoriousDebug(_getContentsDebug(boardState, colTiles))) {
+        console.log("Column victory");
+        victoryTiles.push(...colTiles);
      }
 
-    // check diagonal if we have a corner tile. the row and column must both be 
-    // some permutation of 1 and gameBoardArray.length for a corner tile.
-    if ((playedRow === 0 || playedRow === boardState.length - 1)
-     && (playedCol === 0 || playedRow === boardState[0].length - 1)) {
-        if (debug) { console.log("Checking a diagonal"); }
+    // if the row coordinate equals the column coordinate, we're always on the downwards diagonal
+     if (playedRow === playedCol) {
+        if (debug) { console.log("Checking downwards diagonal"); }
 
-        // check downwards diag for a tile at (1, 1) or at (length, length)
-        if (playedRow === playedCol && _isArrayAllEqualDebug(_getDiagDownDebug(boardState))) {
-            victoryTiles.push(..._getDiagDownDebug(boardState));
+        if (_isVictoriousDebug(_getContentsDebug(boardState, diagDownTiles))) {
+            if (debug) { console.log("Downwards diagonal victory"); }
+
+            victoryTiles.push(...diagDownTiles);
         }
+     }
 
-        // check upwards diag otherwise (for a tile at (1, length) or (length, 1))
-        else if (_isArrayAllEqualDebug(_getDiagUpDebug(boardState))) {
-            victoryTiles.push(..._getDiagUpDebug(boardState));
+     // if the row + column coordinates equal the board size, we're on the upwards diagonal
+     if (playedRow + playedCol === boardState.length - 1) {
+        if (debug) { console.log("Checking upwards diagonal"); }
+
+        if (_isVictoriousDebug(_getContentsDebug(boardState, diagUpTiles))) {
+            if (debug) { console.log("Upwards diagonal victory"); }
+
+            victoryTiles.push(...diagUpTiles);
         }
-    }
-
-    // check both diagonals if we have a center tile
-    else if (playedRow === 1 && playedCol === 1) { // magic number :(
-        if (debug) { console.log("Center tile played - checking both diagonals"); }
-
-        if (_isArrayAllEqualDebug(_getDiagDownDebug(boardState))) {
-             victoryTiles.push(..._getDiagDownDebug(boardState));
-            }
-
-        if (_isArrayAllEqualDebug(_getDiagUpDebug(boardState))) {
-            victoryTiles.push(..._getDiagUpDebug(boardState));
-        }
-    }
+     }
 
     return (victoryTiles.length ? victoryTiles : false);
 }
