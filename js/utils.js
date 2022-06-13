@@ -1,62 +1,70 @@
 // ========== UTILITY/INTERNAL FUNCTIONS ==========
 
-// returns the row of tile objects specified by rowNum
-const _getRow = (rowNum) => {   
-    return gameBoardArray[rowNum - 1];
-}
-
-// returns the column of tile objects specified by colNum, as a horizontal (1D) array
-const _getCol = (colNum) => {
-    const thisCol = [];
-
-    for (row of gameBoardArray) {
-        thisCol.push(row[colNum - 1]);
+// return the coordinates of every tile in row rowNum
+const _getRowCoords = (toGetFrom, rowNum) => {   
+    const fetchedRow = [];
+    for (let colNum = 0; colNum < toGetFrom[rowNum].length; colNum++) {
+        fetchedRow.push([rowNum, colNum]);
     }
 
-    return thisCol;
+    return fetchedRow;
 }
 
-// returns the diagonal of tile objects going downwards from the top left,
-// as a horizontal (1D) array
-const _getDiagDown = () => {
-    const thisDiag = [];
+// returns the coordinates of every tile in column colNum
+const _getColCoords = (toGetFrom, colNum) => {
+    const fetchedCol = [];
 
-    for (let rowCol = 0; rowCol < gameBoardArray.length; rowCol++) {
-        thisDiag.push(gameBoardArray[rowCol][rowCol]);
+    for (let rowNum = 0; rowNum < toGetFrom.length; rowNum++) {
+        fetchedCol.push([rowNum, colNum]);
     }
 
-    return thisDiag;
+    return fetchedCol;
 }
 
-// returns the diagonal of tile objects going upwards from the bottom left,
-// as a horizontal (1D) array
-const _getDiagUp = () => {
-    const thisDiag = [];
+// returns the coordinates of every tile in the downwards diagonal
+const _getDiagDownCoords = (toGetFrom) => {
+    const fetchedDiag = [];
 
-    for (let row = 0; row < gameBoardArray.length; row++) {
-        const col = gameBoardArray[row].length - row - 1;
-        thisDiag.push(gameBoardArray[row][col]);
+    for (let rowCol = 0; rowCol < toGetFrom.length; rowCol++) {
+        fetchedDiag.push([rowCol, rowCol]);
     }
 
-    return thisDiag;
+    return fetchedDiag;
 }
 
-// returns whether the current move is X or O, in the form of the TILE_ constant
-const _thisMove = () => {
-    return (turnCounter % 2 === 1 ? TILE_X : TILE_O);
+// returns the coordinates of every tile in the upwards diagonal
+const _getDiagUpCoords = (toGetFrom) => {
+    const fetchedDiag = [];
+
+    for (let row = 0; row < toGetFrom.length; row++) {
+        const col = toGetFrom[row].length - row - 1;
+        fetchedDiag.push([row, col]);
+    }
+
+    return fetchedDiag;
 }
 
-// returns true if the specified property of every element in toCheck is the
-// same, and false if otherwise
-const _isArrayAllEqual = (toCheck, property) => {
+// returns the TILE_ constant indicating whether the current move is X or O
+const _currentMoveLetter = (thisTurnNum = turnCounter) => {
+    return (thisTurnNum % 2 === 1 ? TILE_X : TILE_O);
+}
+
+// takes an array of TILE_ and returns true if they're all the same
+const _checkVectorForVictory = (toCheck) => {
     // due to the transitive property, it's sufficient to compare each
-    // element to the first element
+    // element to the first element.
+    // TILE_BLANK is falsey, so this function will immediately fail if any of
+    // the tiles being checked is blank.
     return toCheck.every( function(thisElement) {
-        return (thisElement[property] && thisElement[property] === toCheck[0][property]);
+        return (thisElement && thisElement === toCheck[0]);
     });
-
 }
 
-const debugLog = (str) => {
-    if (debug) { console.log(str); };
+const _getDOMTileAt = (coordArray) => {
+    return gameBoardDOMTiles[coordArray[0]][coordArray[1]];
+}
+
+// logs debugStr to the console if the debug flag is set
+const debugLog = (debugStr) => {
+    if (debug) { console.log(debugStr); };
 }
